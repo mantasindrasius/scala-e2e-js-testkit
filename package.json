@@ -1,0 +1,23 @@
+{
+    "name": "embedded-karma",
+    "version": "1.0.0",
+    "devDependencies": {
+        "karma": "*",
+        "jsdom": "*",
+        "promise": "*",
+        "karma-jasmine": "*",
+        "karma-requirejs": "*",
+        "phantomjs": "*",
+        "karma-phantomjs-launcher": "*",
+        "html2js": "*",
+        "karma-html2js-preprocessor": "*",
+        "karma-teamcity-reporter": "*",
+        "karma-junit-reporter": "*",
+        "karma-coverage": "*",
+        "jasmine-reporters": "*",
+        "jasmine": "*"
+    },
+    "engines": {
+        "node": ">=0.8.0"
+    }
+}
