@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "devDependencies": {
         "karma": "*",
-        "jsdom": "*",
+        "jsdom-no-contextify": "*",
         "promise": "*",
         "karma-jasmine": "*",
         "karma-requirejs": "*",
@@ -15,7 +15,12 @@
         "karma-junit-reporter": "*",
         "karma-coverage": "*",
         "jasmine-reporters": "*",
-        "jasmine": "*"
+        "jasmine": "*",
+        "mocha": "*",
+        "chai": "*",
+        "zombie": "*",
+        "xmlhttprequest": "*",
+        "mocha-teamcity-reporter": "*"
     },
     "engines": {
         "node": ">=0.8.0"

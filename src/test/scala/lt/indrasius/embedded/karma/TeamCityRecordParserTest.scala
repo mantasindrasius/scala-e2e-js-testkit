@@ -46,6 +46,16 @@ class TeamCityRecordParserTest extends SpecificationWithJUnit {
       }
     }
 
+    "parse structure of the event containing pipes" in {
+      parser.parseParams("##teamcity[xyz name='respond with a greeting' message='FAILED' details='Expected |'Hello, Mantas|' to be |'XXX|'.|n    at here']") must beSuccessfulTry {
+        beTeamCityRecord(
+          withName = "xyz",
+          withParamsThatAre = havePairs(
+            "name" -> "respond with a greeting",
+            "details" -> "Expected 'Hello, Mantas' to be 'XXX'.\n    at here"))
+      }
+    }
+
     "fail to parse a malformed record" in {
       parser.parseParams("xyz") must beFailedTry.withThrowable[InvalidFormatException]
     }
@@ -70,7 +80,13 @@ class TeamCityRecordParserTest extends SpecificationWithJUnit {
 
     "parse testFinished" in {
       parser.parse("##teamcity[testFinished name='respond with a greeting' duration='78']") must beSuccessfulTry {
-        TestFinishedEvent("respond with a greeting", 78)
+        TestFinishedEvent("respond with a greeting", Some(78))
+      }
+    }
+
+    "parse testFinished with undefined duration" in {
+      parser.parse("##teamcity[testFinished name='display the greeting to the user' duration='undefined']") must beSuccessfulTry {
+        TestFinishedEvent("display the greeting to the user")
       }
     }
 

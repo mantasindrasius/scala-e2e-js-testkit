@@ -16,7 +16,7 @@ describe("a greeting service", function() {
         client
             .post('api/greeting', data)
             .then(function(greeting) {
-                expect(greeting.text).toBe('Hello, Mantas');
+                expect(greeting.text).toBe('XXX');
                 done();
             });
     });

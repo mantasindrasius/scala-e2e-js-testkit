@@ -1,33 +1,31 @@
 package lt.indrasius.embedded.karma
 
-import org.junit.runner.{Result, Description, Runner}
 import org.junit.runner.notification.{Failure, RunNotifier}
+import org.junit.runner.{Description, Runner}
 
 /**
- * Created by mantas on 15.3.5.
+ * Created by mantas on 15.3.11.
  */
-class KarmaJasmineRunner(testClass: Class[_]) extends Runner {
+class MochaRunner(testClass: Class[_]) extends Runner {
   def getDescription: Description =
     Description.createSuiteDescription(testClass)
 
-  override def run(notifier: RunNotifier): Unit = {
-    val karma = new EmbeddedKarma(9898,
-      Seq("bower_components/jquery/dist/jquery.js",
-        "bower_components/promise-js/promise.js",
-        "src/test/resources/dom-parser-fix.js",
-        "src/test/resources/client.js"))
+  override def run(notifier: RunNotifier) = {
+    val nj = new NodeJasmine()
 
     testClass.newInstance()
 
-    karma.startSingle("specs/hello.js") foreach {
+    val events = nj.run("src/test/resources/specs/hello-zombie.js")
+
+    events foreach {
       case InfoEvent(message) =>
         println(message)
       case TestStartedEvent(description) =>
         notifier.fireTestStarted(makeDescriptionFrom(description))
       case TestFinishedEvent(description, duration) =>
         notifier.fireTestFinished(makeDescriptionFrom(description))
-      case TestFailedEvent(description, _, details) =>
-        val failure = new Failure(makeDescriptionFrom(description), new AssertionError(details))
+      case TestFailedEvent(description, message, details) =>
+        val failure = new Failure(makeDescriptionFrom(description), new AssertionError(message))
 
         notifier.fireTestFailure(failure)
       case _ =>

@@ -1,37 +1,13 @@
 package lt.indrasius.embedded.karma
 
-import org.specs2.matcher.Matcher
+import org.specs2.matcher.MustMatchers
 import org.specs2.mutable.Specification
 
 /**
  * Created by mantas on 15.3.4.
  */
-class EmbeddedKarmaIT extends Specification {
+class EmbeddedKarmaIT extends Specification with MustMatchers with LogEventsMatchers {
   val port = EmbeddedEnvironment.SERVER_PORT
-
-  def containInfoEvent(text: String): Matcher[Seq[LogEvent]] =
-    contain(beInfoEvent(be_===(text)))
-
-  def containInfoEvent(withTextThatIs: Matcher[String]): Matcher[Seq[LogEvent]] =
-    contain(beInfoEvent(withTextThatIs))
-
-  def containTestStartedEvent(withDescriptionThatIs: Matcher[String]): Matcher[Seq[LogEvent]] =
-    contain(beTestStartedEvent(withDescriptionThatIs))
-
-  def containBlockClosedEvent(withDescriptionThatIs: Matcher[String]): Matcher[Seq[LogEvent]] =
-    contain(beBlockClosedEvent(withDescriptionThatIs))
-
-  def beInfoEvent(withTextThatIs: Matcher[String]): Matcher[LogEvent] = beLike {
-    case ev: InfoEvent => ev.text must withTextThatIs
-  }
-
-  def beTestStartedEvent(withDescriptionThatIs: Matcher[String]): Matcher[LogEvent] = beLike {
-    case ev: TestStartedEvent => ev.description must withDescriptionThatIs
-  }
-
-  def beBlockClosedEvent(withDescriptionThatIs: Matcher[String]): Matcher[LogEvent] = beLike {
-    case ev: BlockClosedEvent => ev.description must withDescriptionThatIs
-  }
 
   "EmbeddedKarma" should {
     "run karma test" in {
