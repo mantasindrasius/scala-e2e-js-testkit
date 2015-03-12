@@ -22,7 +22,7 @@ class EmbeddedKarmaIT extends Specification with MustMatchers with LogEventsMatc
 
       lines must containInfoEvent(beMatching(".*Karma\\s+.*server\\s+started.*")) and
         containTestStartedEvent(be_===("display the greeting to the user")) and
-        containBlockClosedEvent(be_===("PhantomJS 1.9.8 (Linux)"))
+        containBlockClosedEvent(beMatching("PhantomJS 1.9.8 \\(.*\\)"))
     }
   }
 }

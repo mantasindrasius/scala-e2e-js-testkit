@@ -22,7 +22,7 @@ class NodeJasmineIT extends SpecificationWithJUnit with MustMatchers with LogEve
       val lines = result.toIndexedSeq
 
       lines must containTestStartedEvent(be_===("display the greeting to the user")) and
-        containBlockClosedEvent(be_===("PhantomJS 1.9.8 (Linux)"))
+        containTestSuiteFinishedEvent(beMatching("mocha\\.suite"))
     }
   }
 
