@@ -1,0 +1,527 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Server E2E tests using JavaScript</title>
+
+    <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+    <meta name="author" content="Hakim El Hattab">
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link rel="stylesheet" href="bower_components/reveal-js/css/reveal.css">
+    <link rel="stylesheet" href="bower_components/reveal-js/css/theme/default.css" id="theme">
+
+    <!-- For syntax highlighting -->
+    <link rel="stylesheet" href="bower_components/reveal-js/lib/css/zenburn.css">
+
+    <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+    <script>
+        if( window.location.search.match( /print-pdf/gi ) ) {
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = 'bower_components/reveal-js/css/print/pdf.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        }
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="bower_components/reveal-js/lib/js/html5shiv.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<div class="reveal">
+
+<!-- Any section element inside of this container is displayed as a slide -->
+<div class="slides">
+<section>
+    <h2>Web Application Server End-to-End testing using</h2>
+    <h1>JavaScript</h1>
+    <h3>By Mantas Indrasius</h3>
+</section>
+
+<section>
+    <h2>Agenda</h2>
+    <ul>
+        <li>Why bother?</li>
+        <li>REST + HTML, Sometimes XML</li>
+        <li>Type safety shit</li>
+        <li>Examples of current E2E</li>
+        <li>Requirements</li>
+        <li>Mocha & Jasmine</li>
+        <li>Pros & cons for each</li>
+        <li>node.js + jsdom + mocha</li>
+        <li>phantom?</li>
+        <li>Nashorn + Avatar.js</li>
+        <li>Karma + jasmine, how karma is running</li>
+        <li>IDE integration</li>
+        <li>Tests become shared</li>
+        <li>The winner is</li>
+    </ul>
+
+    <aside class="notes">
+        Side notes (hit 's' on your keyboard).
+    </aside>
+</section>
+
+<!-- Example of nested vertical slides -->
+<section>
+    <section>
+        <h1>Why do we need it?</h1>
+    </section>
+    <section>
+        <h2>Getting close to the client</h2>
+        <ul>
+            <li><strong>The purpose of E2E!</strong></li>
+            <li>We serve for JavaScript</li>
+            <li>HTML, JSON, sometimes XML</li>
+            <li>No type-safety, no schemas</li>
+        </ul>
+    </section>
+    <section>
+        <h2>It's all about contract</h2>
+        <p>
+            <strong>Server should emit content that client must understand</strong>
+        </p>
+    </section>
+    <section>
+        <h2>Faster feedback</h2>
+        <ul>
+            <li>No compilation step is required for a test run</li>
+            <li>Test execution speed plays little part in overall performance</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Fluent syntax</h2>
+        <ul>
+            <li>Object literal maps ~1:1 to the JSON message</li>
+            <li>Async in tests is more fluent</li>
+            <li>Matchers are still around</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Example (ES6)</h2>
+        <pre>
+            <code>
+    describe("a greeting service", function() {
+        var client = new HttpClient('http://localhost:9777/');
+
+        it("display the greeting to the user", done => {
+            whenOrderItemExists({ orderId: 12345 })
+                .then(() => http.post('order/12345/process'))
+                .then(gotResult => expect(gotResult).toBe('OK'))
+                .then(done);
+        });
+    });
+            </code>
+        </pre>
+    </section>
+    <section>
+        <h2>Few scala picks</h2>
+    </section>
+</section>
+
+<section>
+    <h2>Requirements</h2>
+    <ul>
+        <li>No dependency to js build tool</li>
+        <li>At least minimal IDE support</li>
+        <li>TeamCity integration along with server build</li>
+        <li>HTML scripts must not be executed on load</li>
+        <li>Should support matching for both HTML and JSON (duh)</li>
+        <li>jQuery or similar libs could be used for matching content</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Things to consider</h2>
+    <ul>
+        <li>Two execution contexts: node.js and browser libs</li>
+        <li>Dependencies are managed differently</li>
+        <li>Tests should be written for either one or another, sharing is limited</li>
+        <li>Promises vs. callbacks</li>
+    </ul>
+</section>
+
+<section>
+    <section>
+        <h2>Running from the Scala/Java project</h2>
+        <ul>
+            <li>We use a custom test runner</li>
+            <li>The runner invokes some environment manager</li>
+            <li>Which configures the execution environment (config files, reporters, test framework)</li>
+            <li>Tests are execute</li>
+            <li>The runner consumes the reported events</li>
+        </ul>
+    </section>
+    <section>
+        <h2>JUnit custom runner example</h2>
+        <pre>
+            <code class="scala" style="height: 800">
+    override def run(notifier: RunNotifier): Unit = {
+        val karma = new EmbeddedKarma(karmaPort,
+          Seq("bower_components/jquery/dist/jquery.js",
+              "bower_components/promise-js/promise.js",
+              "src/test/resources/dom-parser-fix.js",
+              "src/test/resources/client.js"))
+
+        // instantiate the test class
+        testClass.newInstance()
+
+        karma.startSingle("specs/hello.js") foreach {
+            case InfoEvent(message) =>
+                println(message)
+            case TestStartedEvent(description) =>
+                notifier.fireTestStarted(makeDescriptionFrom(description))
+            case TestFinishedEvent(description, duration) =>
+                notifier.fireTestFinished(makeDescriptionFrom(description))
+            case TestFailedEvent(description, _, details) =>
+                val failure = new Failure(makeDescriptionFrom(description), new AssertionError(details))
+
+                notifier.fireTestFailure(failure)
+            case _ =>
+              // handle error
+        }
+    }
+            </code>
+        </pre>
+    </section>
+</section>
+
+<section>
+    <h1>Let's take a look</h1>
+    <ul>
+        <li>PhantomJS</li>
+        <li>Nashorn</li>
+        <li>Node.JS</li>
+        <li>Karma</li>
+    </ul>
+</section>
+
+<section>
+    <section>
+        <h1>But first</h1>
+        <ul>
+            <li>Jasmine</li>
+            <li>Mocha</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Jasmine example</h2>
+        <pre>
+            <code>
+    it("display the greeting to the user", done => {
+        whenOrderExists({ orderId: 12345 })
+            .then(() => http.post('orders/12345/process', {}))
+            .then(gotResult => { expect(gotResult).toBe('OK'); })
+            .catch(err => fail(err))
+            .then(done);
+    });
+            </code>
+        </pre>
+    </section>
+    <section>
+        <h2>Mocha example</h2>
+        <pre>
+            <code>
+    it("display the greeting to the user", () =>
+        whenOrderExists({ orderId: 12345 })
+            .then(() => http.post('orders/12345/process', {}))
+            .then(gotResult => expect(gotResult).to.be.equal('OK'))
+    );
+            </code>
+        </pre>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h1>PhantomJS</h1>
+    </section>
+    <section>
+        <h2>Page automation</h2>
+        <pre>
+            <code>
+    var page = require('webpage').create();
+    var url = 'http://localhost:9999/greeting.html';
+
+    page.open(url, function(status) {
+        var elements = page.evaluate(function() {
+            return $('span').length;
+        });
+
+        phantom.exit();
+    });
+            </code>
+        </pre>
+    </section>
+    <section>
+        <h2>How would it work</h2>
+        <ul>
+            <li>Start a context server</li>
+            <li>Create a page object and load the context page</li>
+            <li>Run tests that use XHR calls</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Pros</h2>
+        <ul>
+            <li>Direct control</li>
+            <li>Close to the real thing</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Cons</h2>
+        <ul>
+            <li>Reinventing a wheel</li>
+            <li>Hard to manage</li>
+            <li>1.9.8 using an old webkit (from Chrome 13)</li>
+            <li>2.0.0 has a newer one, but won't have the official release</li>
+        </ul>
+    </section>
+    <section>
+        <h1>Dismissed</h1>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h1>Nashorn</h1>
+    </section>
+    <section>
+        <h2>Hello John</h2>
+        <pre>
+            <code class="java">
+    ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+    ScriptEngine nashorn = scriptEngineManager.getEngineByName("nashorn");
+
+    String name = "John";
+    nashorn.eval("print('Hello " + name + "')");
+            </code>
+        </pre>
+    </section>
+    <section>
+        <h2>Avatar.js (aka node.jar)</h2>
+        <p>The goal is to support the Node.js programming model and libs</p>
+        <p class="fragment current-visible grow">Still under development</p>
+    </section>
+    <section>
+        <h2>This works</h2>
+        <pre>
+            <code>
+    var http = require('http');
+
+    function handleRequest(req, res) {
+        res.writeHead(200, {'Content-Type': 'text/plain'});
+        res.end('Hello, World\n');
+    }
+
+    http.createServer(handleRequest).listen(1337, '127.0.0.1');
+            </code>
+        </pre>
+    </section>
+    <section>
+        <h2>Pros</h2>
+        <ul>
+            <li>JVM option</li>
+            <li>Fast boot</li>
+            <li>Multithreaded</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Cons</h2>
+        <ul>
+            <li>It's only syntax</li>
+            <li>Avatar.js (aka node.jar) requires JNI libs</li>
+            <li>No out-of-the-box solution</li>
+            <li>Barebone solution is hard to get working (test runners, deps)</li>
+        </ul>
+    </section>
+    <section>
+        <h1>Dismissed</h1>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h1>Node.js</h1>
+     </section>
+    <section>
+        <h2>jsdom contextify code example</h2>
+    </section>
+    <section>
+        <h2>Pros</h2>
+        <ul>
+            <li>Fast boot</li>
+            <li>Rich infrastructure capabilities</li>
+            <li>Possibility to have a node-based test environment (i.e. fake servers)</li>
+            <li>Built-in dependency management</li>
+        </ul>
+     </section>
+    <section>
+        <h2>Cons</h2>
+        <ul>
+            <li>require statements</li>
+            <li>jsdom has issues related to contextify lib (fortunately there is jsdom-no-contextify)</li>
+            <li>v8 is the only thing related to the browser env</li>
+        </ul>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h1>Karma</h1>
+    </section>
+
+    <section>
+        <h3>The configuration</h3>
+        <pre>
+            <code>
+    module.exports = function(config) {
+      config.set({
+        basePath: '',
+        frameworks: ['jasmine'],
+        files: [
+          'file1.js', 'file2.js'
+        ],
+        reporters: ['teamcity'],
+        colors: false,
+        logLevel: config.LOG_INFO,
+        autoWatch: false,
+        browsers: ['PhantomJS_without_security'],
+        browserNoActivityTimeout: 1000,
+        singleRun: false,
+        customLaunchers: {
+          PhantomJS_without_security: {
+            base: 'PhantomJS',
+            flags: ['--web-security=no']
+          }
+        }
+      });
+    };
+            </code>
+        </pre>
+    </section>
+
+    <section>
+        <h2>Pros</h2>
+        <ul>
+            <li>Mature & powerful</li>
+            <li>Using the actual browser stack</li>
+            <li>Possibility to test on multiple browser vendors and versions</li>
+            <li>Using external context</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Cons</h2>
+        <ul>
+            <li>Takes couple of seconds to boot</li>
+            <li>All test suites should be discovered for reusing the karma instance</li>
+            <li>Possibility to test on real browsers</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Context of execution</h2>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h1>To conclude</h1>
+    </section>
+    <section>
+        <p>Both Node.js and Karma are feasible approaches.</p>
+        <p class="fragment roll-in">Karma is slower, but using the actual XHR and DOM implementation</p>
+        <p class="fragment roll-in">Node.js is fast and has great possibilities to host the whole E2E infrastructure</p>
+    </section>
+</section>
+
+<section>
+    <h1>Thank You</h1>
+</section>
+
+</div>
+
+</div>
+
+<script src="bower_components/reveal-js/lib/js/head.min.js"></script>
+<script src="bower_components/reveal-js/js/reveal.min.js"></script>
+<script src="socket.io/socket.io.js"></script>
+
+<script>
+    var revealRoot = "bower_components/reveal-js/";
+
+    var socket = io.connect("http://192.168.0.103:3000");
+
+    socket.on("message", function(data){
+        console.log(data);
+    });
+
+    socket.on("slidechanged", function(data){
+        Reveal.slide(data.indexh, data.indexv, data.indexf);
+    });
+
+    // Full list of configuration options available here:
+    // https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        transition: 'linear',
+        backgroundTransition: 'default',
+        width: 1280,
+        height: 1600,
+
+        theme: 'beige',
+
+        // Parallax scrolling
+        // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+        // parallaxBackgroundSize: '2100px 900px',
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+            { src: revealRoot + 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+            { src: revealRoot + 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+            { src: revealRoot + 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+            { src: revealRoot + 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+            { src: revealRoot + 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+            { src: revealRoot + 'plugin/notes/notes.js', async: false, condition: function() { return !!document.body.classList; } }
+        ]
+    });
+
+    var notifyServer = function(event){
+        data = {
+            indexv : Reveal.getIndices().v,
+            indexh : Reveal.getIndices().h,
+            indexf : Reveal.getIndices().f || 0
+        };
+
+        socket.emit("slidechanged" , data);
+    };
+
+
+    if (location.search === '?master') {
+        Reveal.addEventListener("slidechanged", notifyServer);
+        Reveal.addEventListener("fragmentshown", notifyServer);
+        Reveal.addEventListener("fragmenthidden", notifyServer);
+
+        Reveal.addEventListener( 'ready', function(event) {
+            RevealNotes.open();
+        });
+    }
+</script>
+
+</body>
+</html>

@@ -7,6 +7,8 @@ import org.specs2.mutable.SpecificationWithJUnit
  * Created by mantas on 15.3.10.
  */
 class NodeJasmineIT extends SpecificationWithJUnit with MustMatchers with LogEventsMatchers {
+  skipAll
+
   val port = EmbeddedEnvironment.SERVER_PORT
 
   "EmbeddedKarma" should {
@@ -25,5 +27,4 @@ class NodeJasmineIT extends SpecificationWithJUnit with MustMatchers with LogEve
         containTestSuiteFinishedEvent(beMatching("mocha\\.suite"))
     }
   }
-
 }

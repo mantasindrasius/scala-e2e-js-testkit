@@ -15,6 +15,8 @@ class EmbeddedKarma(port: Int, dependencies: Seq[String] = Nil) {
   val tempDir = TempDirectory.create(true)
   val karmaConfig = "karma.conf.js"
   val karmaConfPath = tempDir.toPath.resolve(karmaConfig)
+  val frameworks = Seq("mocha", "chai")
+  val disconnectPattern = "WARN\\s\\[[^\\]]+\\]:\\s+(Disconnected\\s+\\(\\d+\\s+times\\).*)".r
 
   val recordParser = new TeamCityRecordParser
 
@@ -23,9 +25,9 @@ class EmbeddedKarma(port: Int, dependencies: Seq[String] = Nil) {
       |module.exports = function(config) {
       |  config.set({
       |    basePath: '',
-      |    frameworks: ['jasmine'],
+      |    frameworks: [${arrayList(frameworks)}],
       |    files: [
-      |      ${inclFiles.mkString("'", "','", "'")}
+      |      ${arrayList(inclFiles)}
       |    ],
       |    reporters: ['teamcity'],
       |    colors: false,
@@ -48,8 +50,13 @@ class EmbeddedKarma(port: Int, dependencies: Seq[String] = Nil) {
       |};
     """.stripMargin
 
+  def arrayList(items: Seq[String]) =
+    items.mkString("'", "','", "'")
+
   def mkKarmaConfig(inclFiles: Seq[String]) = {
     val src = karmaConfSource(inclFiles)
+
+    println(src)
 
     Files.write(karmaConfPath, src.getBytes)
   }
@@ -57,9 +64,16 @@ class EmbeddedKarma(port: Int, dependencies: Seq[String] = Nil) {
   def startSingle(filePath: String): Stream[LogEvent] = {
     val specPath = getClass.getClassLoader.getResource(filePath).toURI.getPath
     val currDir = new File(".")
-    val deps = dependencies map { new File(currDir, _).getAbsolutePath }
+    //val deps = dependencies map { new File(currDir, _).getAbsolutePath }
 
-    mkKarmaConfig(deps :+ specPath)
+    JSEnv.installNodePackageIfNeeded("karma")
+    JSEnv.installNodePackageIfNeeded("karma-mocha")
+    JSEnv.installNodePackageIfNeeded("mocha-teamcity-reporter")
+    JSEnv.installNodePackageIfNeeded("karma-chai")
+    JSEnv.installNodePackageIfNeeded("karma-phantomjs-launcher")
+    JSEnv.installNodePackageIfNeeded("karma-teamcity-reporter")
+
+    mkKarmaConfig(dependencies :+ specPath)
 
     val logger = ProcessLogger(s => (), err => ())
     val process = Process(s"karma start $karmaConfPath --port=$port --single-run")
@@ -70,6 +84,10 @@ class EmbeddedKarma(port: Int, dependencies: Seq[String] = Nil) {
     lines map { line =>
       recordParser.parse(line) match {
         case Success(event) => event
+        case _ if disconnectPattern.findFirstMatchIn(line).nonEmpty =>
+          val message = disconnectPattern.findFirstMatchIn(line).head.group(1)
+
+          TestRunnerDisconnectedEvent(message)
         case _ => InfoEvent(line)
       }
     }
@@ -89,3 +107,4 @@ case class TestFinishedEvent(description: String, duration: Option[Int] = None) 
 case class TestSuiteFinishedEvent(description: String) extends LogEvent
 case class TestFailedEvent(description: String, message: String, details: String) extends LogEvent
 case class BlockClosedEvent(description: String) extends LogEvent
+case class TestRunnerDisconnectedEvent(description: String) extends LogEvent

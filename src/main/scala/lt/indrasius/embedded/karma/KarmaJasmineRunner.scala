@@ -17,6 +17,7 @@ class KarmaJasmineRunner(testClass: Class[_]) extends Runner {
         "src/test/resources/dom-parser-fix.js",
         "src/test/resources/client.js"))
 
+    // instantiate the test class
     testClass.newInstance()
 
     karma.startSingle("specs/hello.js") foreach {
@@ -31,6 +32,7 @@ class KarmaJasmineRunner(testClass: Class[_]) extends Runner {
 
         notifier.fireTestFailure(failure)
       case _ =>
+        // handle error
     }
   }
 

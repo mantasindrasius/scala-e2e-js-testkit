@@ -22,6 +22,9 @@ trait LogEventsMatchers { this: Matchers with MustMatchers =>
   def containTestSuiteFinishedEvent(withDescriptionThatIs: Matcher[String]): Matcher[Seq[LogEvent]] =
     contain(beTestSuiteFinishedEvent(withDescriptionThatIs))
 
+  def containDisconnectedEvent(description: String): Matcher[Seq[LogEvent]] =
+    contain(beDisconnectedEvent(description))
+
   def beInfoEvent(withTextThatIs: Matcher[String]): Matcher[LogEvent] = beLike {
     case ev: InfoEvent => ev.text must withTextThatIs
   }
@@ -36,5 +39,9 @@ trait LogEventsMatchers { this: Matchers with MustMatchers =>
 
   def beTestSuiteFinishedEvent(withDescriptionThatIs: Matcher[String]): Matcher[LogEvent] = beLike {
     case ev: TestSuiteFinishedEvent => ev.description must withDescriptionThatIs
+  }
+
+  def beDisconnectedEvent(description: String): Matcher[LogEvent] = beLike {
+    case ev: TestRunnerDisconnectedEvent => ev.description must_== description
   }
 }

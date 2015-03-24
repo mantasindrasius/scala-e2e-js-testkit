@@ -25,12 +25,15 @@ class MochaRunner(testClass: Class[_]) extends Runner {
       case TestFinishedEvent(description, duration) =>
         notifier.fireTestFinished(makeDescriptionFrom(description))
       case TestFailedEvent(description, message, details) =>
-        val failure = new Failure(makeDescriptionFrom(description), new AssertionError(message))
-
-        notifier.fireTestFailure(failure)
+        notifier.fireTestFailure(failureFor(description, message))
+      case TestRunnerDisconnectedEvent(description) =>
+        notifier.fireTestFailure(failureFor(description, "Test run incomplete"))
       case _ =>
     }
   }
+
+  def failureFor(description: String, message: String) =
+    new Failure(makeDescriptionFrom(description), new AssertionError(message))
 
   def makeDescriptionFrom(desc: String) =
     Description.createTestDescription(testClass, desc)

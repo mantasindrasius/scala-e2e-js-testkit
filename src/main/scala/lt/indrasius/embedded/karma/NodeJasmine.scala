@@ -58,20 +58,13 @@ class NodeJasmine {
 
   def run(filePath: String): Stream[LogEvent] = {
     val tempDir = new File(".")
-    //tempDir.mkdirs()
-
     val tempPath = tempDir.toPath
 
     val runnerFile = tempPath.resolve("run.js")
-    //val packageFile = tempPath.resolve("package.json")
 
     Files.write(runnerFile, makeRunnerScript(filePath).getBytes)
-    //Files.write(packageFile, makePackageJson.getBytes)
-
-    //Process(s"npm install ${tempPath.toAbsolutePath}", tempDir).run().exitValue()
 
     val process = Process(s"node $runnerFile")
-    //val lines = process.lines_!
 
     val logger = ProcessLogger(s => (), err => ())
     val lines = process.lines_!

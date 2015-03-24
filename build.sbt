@@ -1,6 +1,8 @@
-name := "embedded-karma"
+name := "js-e2e-testkit"
 
-version := "1.0"
+organization := "lt.indrasius"
+
+version := "1.0-SNAPSHOT"
 
 scalaVersion := "2.10.4"
 
@@ -15,3 +17,5 @@ libraryDependencies += "com.twitter" %% "util-core" % "6.23.0"
 libraryDependencies += "lt.indrasius" %% "embedded-server" % "1.0-SNAPSHOT" % "test"
 
 libraryDependencies += "lt.indrasius" %% "http-testkit" % "1.0-SNAPSHOT" % "test"
+
+libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.11"
