@@ -29,8 +29,13 @@ class JSSpecRunner(testClass: Class[_]) extends Runner { this: JSSpecEnvironment
         notifier.fireTestStarted(makeDescriptionFrom(description))
       case TestFinishedEvent(description, duration) =>
         notifier.fireTestFinished(makeDescriptionFrom(description))
-      case TestFailedEvent(description, _, details) =>
-        notifier.fireTestFailure(failureFor(description, details))
+      case TestFailedEvent(description, error, details) =>
+        val failure = details match {
+          case null | "" => error
+          case _ => details
+        }
+
+        notifier.fireTestFailure(failureFor(description, failure))
       case TestRunnerDisconnectedEvent(description) =>
         notifier.fireTestFailure(failureFor("a spec has timeouted", description))
       case _ =>
