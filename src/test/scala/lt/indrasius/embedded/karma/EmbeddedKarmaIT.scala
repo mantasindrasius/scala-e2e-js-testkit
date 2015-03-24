@@ -10,6 +10,8 @@ import org.specs2.specification.Scope
  * Created by mantas on 15.3.4.
  */
 class EmbeddedKarmaIT extends Specification with MustMatchers with LogEventsMatchers {
+  sequential
+
   class Context extends Scope {
     val relativeDeps = Seq(
       "bower_components/jquery/dist/jquery.js",
