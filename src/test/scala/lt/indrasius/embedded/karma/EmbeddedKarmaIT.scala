@@ -1,6 +1,7 @@
 package lt.indrasius.embedded.karma
 
 import java.nio.file.Paths
+import lt.indrasius.embedded.karma.env.EmbeddedEnvironment
 import org.specs2.matcher.MustMatchers
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -9,10 +10,9 @@ import org.specs2.specification.Scope
  * Created by mantas on 15.3.4.
  */
 class EmbeddedKarmaIT extends Specification with MustMatchers with LogEventsMatchers {
-  val port = EmbeddedEnvironment.SERVER_PORT
-
   class Context extends Scope {
-    val relativeDeps = Seq("bower_components/jquery/dist/jquery.js",
+    val relativeDeps = Seq(
+      "bower_components/jquery/dist/jquery.js",
       "bower_components/promise-js/promise.js",
       "src/test/resources/dom-parser-fix.js",
       "src/test/resources/client.js")
@@ -24,11 +24,11 @@ class EmbeddedKarmaIT extends Specification with MustMatchers with LogEventsMatc
     "run karma test" in new Context {
       val karma = new EmbeddedKarma(9898, deps)
 
-      val result = karma.startSingle("specs/hello.js")
+      val result = karma.startSingle("specs/hello-karma.js")
       val lines = result.toIndexedSeq
 
       lines must containInfoEvent(beMatching(".*Karma\\s+.*server\\s+started.*")) and
-        containTestStartedEvent(be_===("display the greeting to the user")) and
+        containTestStartedEvent(be_===("be a successful try")) and
         containBlockClosedEvent(beMatching("PhantomJS 1.9.8 \\(.*\\)"))
     }
 

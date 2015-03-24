@@ -1,10 +1,12 @@
 package lt.indrasius.embedded.karma
 
+import lt.indrasius.embedded.karma.env.EmbeddedEnvironment
+
 /**
  * Created by mantas on 15.3.5.
  */
 class HelloKarmaSpec extends MochaSpec("specs/hello.js") with KarmaRunner {
-  EmbeddedEnvironment.SERVER_PORT
+  config("baseUrl" -> s"http://localhost:${EmbeddedEnvironment.SERVER_PORT}/")
 
   bowerInclude("jquery", "promise-js")
 

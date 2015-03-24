@@ -1,12 +1,17 @@
 package lt.indrasius.embedded.karma
 
 import java.io.File
+import java.nio.file.{Paths, Files}
 
 /**
  * Created by mantas on 15.3.24.
  */
 trait KarmaRunner extends JSSpecEnvironmentRunner {
   private val includes = Seq.newBuilder[KarmaInclude]
+  private val configValues = Map.newBuilder[String, String]
+
+  def config(values: (String, String)*) =
+    configValues ++= values
 
   def bowerInclude(names: String*) =
     names foreach {
@@ -24,7 +29,11 @@ trait KarmaRunner extends JSSpecEnvironmentRunner {
     }
 
   def runSpec(file: String) = {
-    val inclFiles = includes.result() flatMap { _.resolve }
+    val configFile = File.createTempFile("jsConfig", ".js").getAbsolutePath
+    val inclFiles = configFile +: (includes.result() flatMap { _.resolve })
+    val content = s"var jsExecConfig = " + JSON.stringify(configValues.result()) + ";"
+
+    Files.write(Paths.get(configFile), content.getBytes)
 
     inclFiles foreach { f =>
       println("Including " + f)

@@ -1,4 +1,4 @@
-package lt.indrasius.embedded.karma
+package lt.indrasius.embedded.karma.env
 
 /**
  * Created by mantas on 15.3.7.

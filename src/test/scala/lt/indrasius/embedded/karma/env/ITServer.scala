@@ -1,10 +1,10 @@
-package lt.indrasius.embedded.karma
+package lt.indrasius.embedded.karma.env
 
+import lt.indrasius.rubies.http.picking._
 import lt.indrasius.rubies.http.server.EmbeddedServer
-import spray.http._
 import spray.http.HttpMethods._
 import spray.http.StatusCodes._
-import lt.indrasius.rubies.http.picking._
+import spray.http._
 
 /**
  * Created by mantas on 15.3.7.

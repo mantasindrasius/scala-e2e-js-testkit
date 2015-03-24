@@ -1,5 +1,6 @@
 package lt.indrasius.embedded.karma
 
+import lt.indrasius.embedded.karma.env.EmbeddedEnvironment
 import org.specs2.mutable.SpecificationWithJUnit
 
 /**

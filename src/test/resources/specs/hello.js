@@ -1,5 +1,5 @@
 describe("a greeting service", function() {
-    var client = new HttpClient('http://localhost:9777/');
+    var client = new HttpClient(jsExecConfig.baseUrl);
 
     it("display the greeting to the user", function() {
         return client

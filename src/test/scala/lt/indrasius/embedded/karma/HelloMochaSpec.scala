@@ -1,5 +1,7 @@
 package lt.indrasius.embedded.karma
 
+import lt.indrasius.embedded.karma.env.EmbeddedEnvironment
+
 /**
  * Created by mantas on 15.3.11.
  */

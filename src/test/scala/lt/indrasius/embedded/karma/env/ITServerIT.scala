@@ -1,4 +1,4 @@
-package lt.indrasius.embedded.karma
+package lt.indrasius.embedded.karma.env
 
 import lt.indrasius.rubies.http.testkit._
 import lt.indrasius.rubies.http.testkit.specs2.HttpResponseMatchers
