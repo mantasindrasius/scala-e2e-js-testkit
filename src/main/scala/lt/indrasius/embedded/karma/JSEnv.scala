@@ -11,7 +11,7 @@ import scala.sys.process.Process
  * Created by mantas on 15.3.23.
  */
 object JSEnv {
-  private val globalDirFile = new File(".")
+  private val globalDirFile = new File(".").getAbsoluteFile
   private val nodeModulesDirFile = new File(globalDirFile, "node_modules")
   private val bowerComponentsDir = new File(globalDirFile, "bower_components")
 
@@ -21,9 +21,7 @@ object JSEnv {
 
   def installNodePackageIfNeeded(name: String) = {
     if (!nodePackageExists(name)) {
-      val pb = Process(s"npm install $name", globalDirFile)
-
-      pb.run().exitValue()
+      sys.process.Process(Seq("npm", "install", name), globalDirFile).!!
     }
   }
 
@@ -46,6 +44,9 @@ object JSEnv {
 
     new BowerPackage(new File(bowerComponentsDir, name).getAbsolutePath)
   }
+
+  def resolve(name: String): String =
+    globalDirFile.toPath.resolve(name).toString
 }
 
 class BowerPackage(bowerDir: String) {

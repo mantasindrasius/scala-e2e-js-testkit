@@ -44,7 +44,7 @@
 <!-- Any section element inside of this container is displayed as a slide -->
 <div class="slides">
 <section>
-    <h2>Web Application Server End-to-End testing using</h2>
+    <h2>Server End-to-End testing using</h2>
     <h1>JavaScript</h1>
     <h3>By Mantas Indrasius</h3>
 </section>
@@ -75,29 +75,32 @@
 
 <!-- Example of nested vertical slides -->
 <section>
+    <h1>Acceptance tests is not our topic today</h1>
+</section>
+<section>
+    <h1>So what are we going to talk about?</h1>
+    <p class="current-visible grow">In server development E2E tests is a nickname for server component tests.</p>
+</section>
+<section>
     <section>
-        <h1>Why do we need it?</h1>
+        <h1>So why JavaScript?</h1>
     </section>
     <section>
-        <h2>Getting close to the client</h2>
+        <h2>Closer environment</h2>
         <ul>
-            <li><strong>The purpose of E2E!</strong></li>
-            <li>We serve for JavaScript</li>
-            <li>HTML, JSON, sometimes XML</li>
-            <li>No type-safety, no schemas</li>
+            <li>E2E should run in as close environment as possible</li>
+            <li>So we have better edge-to-edge converage</li>
+            <li>We serve for JavaScript that runs in a browser</li>
+            <li>We find the same DOM implementation</li>
         </ul>
     </section>
     <section>
-        <h2>It's all about contract</h2>
-        <p>
-            <strong>Server should emit content that client must understand</strong>
-        </p>
-    </section>
-    <section>
-        <h2>Faster feedback</h2>
+        <h2>Why be a type-safe?</h2>
         <ul>
-            <li>No compilation step is required for a test run</li>
-            <li>Test execution speed plays little part in overall performance</li>
+            <li>It's HTML, JSON, sometimes XML</li>
+            <li>No type-safety, no schemas</li>
+            <li>Our task is to dispatch a request and assert the response</li>
+            <li>It's all about contract</li>
         </ul>
     </section>
     <section>
@@ -109,58 +112,73 @@
         </ul>
     </section>
     <section>
-        <h2>Example (ES6)</h2>
+        <h2>Faster feedback</h2>
+        <ul>
+            <li>No compilation step is required for a test run</li>
+            <li>Test execution speed plays little part in overall performance</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Technology agnostic</h2>
+        <ul>
+            <li>The tests become shared with the client end</li>
+            <li>No need to rewrite the tests if move from the current technology</li>
+            <li>You can run the tests from Grunt, Gulp and other tools</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Example</h2>
         <pre>
             <code>
-    describe("a greeting service", function() {
+    describe("a product service", function() {
         var client = new HttpClient('http://localhost:9777/');
 
-        it("display the greeting to the user", done => {
+        it("processes the order successfully", () =>
             whenOrderItemExists({ orderId: 12345 })
                 .then(() => http.post('order/12345/process'))
-                .then(gotResult => expect(gotResult).toBe('OK'))
-                .then(done);
-        });
+                .then(gotResult => expect(gotResult).to.beSuccessful)
+        );
     });
             </code>
         </pre>
     </section>
-    <section>
-        <h2>Few scala picks</h2>
-    </section>
 </section>
-
+<section>
+    <h1>Let's work out a solution for that</h1>
+</section>
 <section>
     <h2>Requirements</h2>
     <ul>
-        <li>No dependency to js build tool</li>
-        <li>At least minimal IDE support</li>
-        <li>TeamCity integration along with server build</li>
+        <li>Out-of-the-box for the server developer</li>
+        <li>No dependency to JS build tools</li>
+        <li>At least a minimal IDE support</li>
+        <li>Integrated into the server build</li>
+        <li>CI support</li>
         <li>HTML scripts must not be executed on load</li>
-        <li>Should support matching for both HTML and JSON (duh)</li>
-        <li>jQuery or similar libs could be used for matching content</li>
+        <li>Should support matching both HTML and JSON (duh)</li>
+        <li>It should be possible to add JS dependencies</li>
     </ul>
 </section>
 
 <section>
     <h2>Things to consider</h2>
     <ul>
-        <li>Two execution contexts: node.js and browser libs</li>
-        <li>Dependencies are managed differently</li>
-        <li>Tests should be written for either one or another, sharing is limited</li>
+        <li>Two execution contexts: node.js and browser window</li>
+        <li>Imports & dependencies are managed differently</li>
+        <li>Tests should be written for either one or another, sharing is not nice</li>
         <li>Promises vs. callbacks</li>
     </ul>
 </section>
 
 <section>
     <section>
-        <h2>Running from the Scala/Java project</h2>
+        <h2>How to run it from the Scala/Java project?</h2>
         <ul>
-            <li>We use a custom test runner</li>
-            <li>The runner invokes some environment manager</li>
-            <li>Which configures the execution environment (config files, reporters, test framework)</li>
-            <li>Tests are execute</li>
-            <li>The runner consumes the reported events</li>
+            <li>We can write a custom test runner (JUnit, sbt test interface etc.)</li>
+            <li>The runner starts the environment</li>
+            <li>Which configures the execution environment (dependencies, config files, reporters, test framework)</li>
+            <li>Tests are executed while the runner consumes the report output</li>
+            <li>Report events are translated into the running framework</li>
         </ul>
     </section>
     <section>
@@ -168,29 +186,11 @@
         <pre>
             <code class="scala" style="height: 800">
     override def run(notifier: RunNotifier): Unit = {
-        val karma = new EmbeddedKarma(karmaPort,
-          Seq("bower_components/jquery/dist/jquery.js",
-              "bower_components/promise-js/promise.js",
-              "src/test/resources/dom-parser-fix.js",
-              "src/test/resources/client.js"))
+        notifier.fireTestStarted(aDescriptionFor("Success test"))
+        notifier.fireTestStarted(aDescriptionFor("Failing test"))
 
-        // instantiate the test class
-        testClass.newInstance()
-
-        karma.startSingle("specs/hello.js") foreach {
-            case InfoEvent(message) =>
-                println(message)
-            case TestStartedEvent(description) =>
-                notifier.fireTestStarted(makeDescriptionFrom(description))
-            case TestFinishedEvent(description, duration) =>
-                notifier.fireTestFinished(makeDescriptionFrom(description))
-            case TestFailedEvent(description, _, details) =>
-                val failure = new Failure(makeDescriptionFrom(description), new AssertionError(details))
-
-                notifier.fireTestFailure(failure)
-            case _ =>
-              // handle error
-        }
+        notifier.fireTestFinished(aDescriptionFor("Success test"))
+        notifier.fireTestFailure(aFailureFor("It went wrong", assertion = "true expected to be false"))
     }
             </code>
         </pre>
@@ -198,21 +198,136 @@
 </section>
 
 <section>
-    <h1>Let's take a look</h1>
-    <ul>
-        <li>PhantomJS</li>
-        <li>Nashorn</li>
-        <li>Node.JS</li>
-        <li>Karma</li>
-    </ul>
+    <section>
+        <h1>What has been dismissed</h1>
+        <ul>
+            <li>Bare PhantomJS</li>
+            <li>Nashorn + Avatar.js</li>
+        </ul>
+    </section>
+
+    <section>
+        <section>
+            <h1>PhantomJS</h1>
+        </section>
+        <section>
+            <h2>Page automation</h2>
+        <pre>
+            <code>
+                var page = require('webpage').create();
+                var url = 'http://localhost:9999/greeting.html';
+
+                page.open(url, function(status) {
+                var elements = page.evaluate(function() {
+                return $('span').length;
+                });
+
+                phantom.exit();
+                });
+            </code>
+        </pre>
+        </section>
+        <section>
+            <h2>How would it work</h2>
+            <ul>
+                <li>Start a context server</li>
+                <li>Create a page object and load the context page</li>
+                <li>Run tests that use XHR calls</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Pros</h2>
+            <ul>
+                <li>Direct control</li>
+                <li>Close to the real thing</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Cons</h2>
+            <ul>
+                <li>Reinventing a wheel</li>
+                <li>Hard to manage</li>
+                <li>1.9.8 using an old webkit (from Chrome 13)</li>
+                <li>2.0.0 has a newer one, but won't have the official release</li>
+            </ul>
+        </section>
+        <section>
+            <h1>Dismissed</h1>
+        </section>
+    </section>
+
+    <section>
+        <section>
+            <h1>Nashorn</h1>
+        </section>
+        <section>
+            <h2>Hello John</h2>
+        <pre>
+            <code class="java">
+    ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+    ScriptEngine nashorn = scriptEngineManager.getEngineByName("nashorn");
+
+    String name = "John";
+    nashorn.eval("print('Hello " + name + "')");
+            </code>
+        </pre>
+        </section>
+        <section>
+            <h2>Avatar.js (aka node.jar)</h2>
+            <p>The goal is to support the Node.js programming model and libs</p>
+            <p class="fragment current-visible grow">Still under development</p>
+        </section>
+        <section>
+            <h2>This works</h2>
+        <pre>
+            <code>
+    var http = require('http');
+
+    function handleRequest(req, res) {
+        res.writeHead(200, {'Content-Type': 'text/plain'});
+        res.end('Hello, World\n');
+    }
+
+    http.createServer(handleRequest).listen(1337, '127.0.0.1');
+            </code>
+        </pre>
+        </section>
+        <section>
+            <h2>Pros</h2>
+            <ul>
+                <li>JVM option</li>
+                <li>Fast boot</li>
+                <li>Multithreaded</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Cons</h2>
+            <ul>
+                <li>It's only syntax</li>
+                <li>Avatar.js (aka node.jar) requires JNI libs</li>
+                <li>No out-of-the-box solution</li>
+                <li>Barebone solution is hard to get working (test runners, deps)</li>
+            </ul>
+        </section>
+        <section>
+            <h1>Dismissed</h1>
+        </section>
+    </section>
 </section>
 
 <section>
     <section>
-        <h1>But first</h1>
+        <h1>The test frameworks</h1>
         <ul>
             <li>Jasmine</li>
-            <li>Mocha</li>
+            <li>Mocha + Chai</li>
+        </ul>
+    </section>
+    <section>
+        <ul>
+            <li>Jasmine is more feature rich</li>
+            <li>But Mocha treats the promises well</li>
+            <li>And is easier to run in different environments</li>
         </ul>
     </section>
     <section>
@@ -230,7 +345,7 @@
         </pre>
     </section>
     <section>
-        <h2>Mocha example</h2>
+        <h2>Mocha + Chai example</h2>
         <pre>
             <code>
     it("display the greeting to the user", () =>
@@ -244,120 +359,18 @@
 </section>
 
 <section>
-    <section>
-        <h1>PhantomJS</h1>
-    </section>
-    <section>
-        <h2>Page automation</h2>
-        <pre>
-            <code>
-    var page = require('webpage').create();
-    var url = 'http://localhost:9999/greeting.html';
-
-    page.open(url, function(status) {
-        var elements = page.evaluate(function() {
-            return $('span').length;
-        });
-
-        phantom.exit();
-    });
-            </code>
-        </pre>
-    </section>
-    <section>
-        <h2>How would it work</h2>
-        <ul>
-            <li>Start a context server</li>
-            <li>Create a page object and load the context page</li>
-            <li>Run tests that use XHR calls</li>
-        </ul>
-    </section>
-    <section>
-        <h2>Pros</h2>
-        <ul>
-            <li>Direct control</li>
-            <li>Close to the real thing</li>
-        </ul>
-    </section>
-    <section>
-        <h2>Cons</h2>
-        <ul>
-            <li>Reinventing a wheel</li>
-            <li>Hard to manage</li>
-            <li>1.9.8 using an old webkit (from Chrome 13)</li>
-            <li>2.0.0 has a newer one, but won't have the official release</li>
-        </ul>
-    </section>
-    <section>
-        <h1>Dismissed</h1>
-    </section>
+    <h1>Let's focus on these 2</h1>
+    <ul>
+        <li>Node.js</li>
+        <li>Karma</li>
+    </ul>
 </section>
 
-<section>
-    <section>
-        <h1>Nashorn</h1>
-    </section>
-    <section>
-        <h2>Hello John</h2>
-        <pre>
-            <code class="java">
-    ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-    ScriptEngine nashorn = scriptEngineManager.getEngineByName("nashorn");
-
-    String name = "John";
-    nashorn.eval("print('Hello " + name + "')");
-            </code>
-        </pre>
-    </section>
-    <section>
-        <h2>Avatar.js (aka node.jar)</h2>
-        <p>The goal is to support the Node.js programming model and libs</p>
-        <p class="fragment current-visible grow">Still under development</p>
-    </section>
-    <section>
-        <h2>This works</h2>
-        <pre>
-            <code>
-    var http = require('http');
-
-    function handleRequest(req, res) {
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.end('Hello, World\n');
-    }
-
-    http.createServer(handleRequest).listen(1337, '127.0.0.1');
-            </code>
-        </pre>
-    </section>
-    <section>
-        <h2>Pros</h2>
-        <ul>
-            <li>JVM option</li>
-            <li>Fast boot</li>
-            <li>Multithreaded</li>
-        </ul>
-    </section>
-    <section>
-        <h2>Cons</h2>
-        <ul>
-            <li>It's only syntax</li>
-            <li>Avatar.js (aka node.jar) requires JNI libs</li>
-            <li>No out-of-the-box solution</li>
-            <li>Barebone solution is hard to get working (test runners, deps)</li>
-        </ul>
-    </section>
-    <section>
-        <h1>Dismissed</h1>
-    </section>
-</section>
 
 <section>
     <section>
         <h1>Node.js</h1>
      </section>
-    <section>
-        <h2>jsdom contextify code example</h2>
-    </section>
     <section>
         <h2>Pros</h2>
         <ul>
@@ -370,10 +383,13 @@
     <section>
         <h2>Cons</h2>
         <ul>
-            <li>require statements</li>
-            <li>jsdom has issues related to contextify lib (fortunately there is jsdom-no-contextify)</li>
-            <li>v8 is the only thing related to the browser env</li>
+            <li>It's not a browser env</li>
+            <li>Harder to inject the configuration</li>
+            <li>jsdom has issues related to contextify lib (fortunately there is a fork jsdom-no-contextify)</li>
         </ul>
+    </section>
+    <section>
+        <h1>See how it works</h1>
     </section>
 </section>
 
@@ -425,14 +441,12 @@
     <section>
         <h2>Cons</h2>
         <ul>
-            <li>Takes couple of seconds to boot</li>
-            <li>All test suites should be discovered for reusing the karma instance</li>
-            <li>Possibility to test on real browsers</li>
+            <li>Takes a second to start</li>
         </ul>
     </section>
 
     <section>
-        <h2>Context of execution</h2>
+        <h1>See how it works</h1>
     </section>
 </section>
 
@@ -442,8 +456,9 @@
     </section>
     <section>
         <p>Both Node.js and Karma are feasible approaches.</p>
-        <p class="fragment roll-in">Karma is slower, but using the actual XHR and DOM implementation</p>
-        <p class="fragment roll-in">Node.js is fast and has great possibilities to host the whole E2E infrastructure</p>
+        <p class="fragment roll-in">Karma is slower to start, but using the actual XHR and DOM implementation</p>
+        <p class="fragment roll-in">Node.js is fast and has great possibilities to host the whole server E2E infrastructure</p>
+        <p class="fragment roll-in">We could actually combine them</p>
     </section>
 </section>
 

@@ -8,7 +8,9 @@ import lt.indrasius.embedded.karma.env.EmbeddedEnvironment
 class HelloKarmaSpec extends MochaSpec("specs/hello.js") with KarmaRunner {
   config("baseUrl" -> s"http://localhost:${EmbeddedEnvironment.SERVER_PORT}/")
 
-  bowerInclude("jquery", "promise-js")
+  bowerInclude(
+    "jquery",
+    "promise-js")
 
   fileInclude(
     "src/test/resources/dom-parser-fix.js",

@@ -7,4 +7,6 @@ object EmbeddedEnvironment {
   val SERVER_PORT = ITServer.port
 
   ITServer.start
+
+  def apply() = ()
 }
