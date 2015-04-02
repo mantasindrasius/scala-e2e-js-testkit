@@ -11,7 +11,7 @@ class MochaRunner(testClass: Class[_]) extends Runner {
     Description.createSuiteDescription(testClass)
 
   override def run(notifier: RunNotifier) = {
-    val nj = new NodeJasmine()
+    val nj = new NodeMocha()
 
     testClass.newInstance()
 

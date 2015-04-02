@@ -3,15 +3,13 @@ package lt.indrasius.embedded.karma
 import java.io.File
 import java.nio.file.Files
 
-import com.twitter.io.TempDirectory
-
-import scala.sys.process.{ProcessLogger, Process}
+import scala.sys.process.{Process, ProcessLogger}
 import scala.util.Success
 
 /**
  * Created by mantas on 15.3.10.
  */
-class NodeJasmine {
+class NodeMocha {
   val recordParser = new TeamCityRecordParser
 
   def makeRunnerScript(testFile:String) =

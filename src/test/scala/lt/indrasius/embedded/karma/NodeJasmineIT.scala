@@ -14,7 +14,7 @@ class NodeJasmineIT extends SpecificationWithJUnit with MustMatchers with LogEve
 
   "EmbeddedKarma" should {
     "run karma test" in {
-      val nj = new NodeJasmine()
+      val nj = new NodeMocha()
 
       /*Seq("bower_components/jquery/dist/jquery.js",
           "bower_components/promise-js/promise.js",

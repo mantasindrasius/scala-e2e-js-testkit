@@ -54,7 +54,7 @@ case class BowerInclude(name: String) extends KarmaInclude {
 }
 
 case class ClassPathInclude(name: String) extends KarmaInclude {
-  def resolve: Seq[String] = Seq(getClass.getClassLoader.getResource(name).getFile)
+  def resolve: Seq[String] = Option(getClass.getClassLoader.getResource(name).getFile).toSeq
 }
 
 case class FileInclude(name: String) extends KarmaInclude {

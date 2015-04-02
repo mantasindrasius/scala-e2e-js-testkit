@@ -32,5 +32,9 @@ object ITServer extends EmbeddedServer(9777) {
   }
 }
 
+object Application extends App {
+  ITServer
+}
+
 case class Greeter(name: String)
 case class Greeting(text: String)

@@ -22,7 +22,7 @@ gulp.task('present', function() {
     var app = express();
     app.use(ecstatic({ root: __dirname + '/present' }));
 
-    var server = http.createServer(app).listen(3000, '0.0.0.0');
+    var server = http.createServer(app).listen(3000, '127.0.0.1');
     var servIO = io.listen(server);
 
     servIO.sockets.on('connection', function (socket) {

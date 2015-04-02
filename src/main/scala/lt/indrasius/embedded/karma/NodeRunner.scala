@@ -8,7 +8,7 @@ trait NodeRunner extends JSSpecEnvironmentRunner {
     names foreach { JSEnv.installNodePackageIfNeeded(_) }
 
   def runSpec(file: String): Stream[LogEvent] = {
-    val nj = new NodeJasmine
+    val nj = new NodeMocha
 
     nj.run(getClass.getClassLoader.getResource(file).getFile)
   }

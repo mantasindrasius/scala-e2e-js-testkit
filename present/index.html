@@ -35,6 +35,29 @@
     <!--[if lt IE 9]>
     <script src="bower_components/reveal-js/lib/js/html5shiv.js"></script>
     <![endif]-->
+
+    <style>
+        .inline-code {
+            color: white;
+            font-size: 80% !important;
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+        }
+
+        .great-bullets {
+            font-size: 120% !important;
+        }
+
+        strong {
+            color: white;
+        }
+
+        em {
+            color: #ccc;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -46,31 +69,26 @@
 <section>
     <h2>Server End-to-End testing using</h2>
     <h1>JavaScript</h1>
-    <h3>By Mantas Indrasius</h3>
+</section>
+
+<section style="text-align: left">
+    <!-- div class="left-side"><img src="images/tiger.png" /></div -->
+    <div class="right-side">
+        <h3 style="font-family: arial">Mantas Indrašius</h3>
+        <h3>Software engineer at WIX, Tigers team</h3>
+    </div>
 </section>
 
 <section>
     <h2>Agenda</h2>
-    <ul>
-        <li>Why bother?</li>
-        <li>REST + HTML, Sometimes XML</li>
-        <li>Type safety shit</li>
-        <li>Examples of current E2E</li>
-        <li>Requirements</li>
-        <li>Mocha & Jasmine</li>
-        <li>Pros & cons for each</li>
-        <li>node.js + jsdom + mocha</li>
-        <li>phantom?</li>
-        <li>Nashorn + Avatar.js</li>
-        <li>Karma + jasmine, how karma is running</li>
-        <li>IDE integration</li>
-        <li>Tests become shared</li>
-        <li>The winner is</li>
+    <ul class="bullets">
+        <li>What we will be talking about</li>
+        <li>Why JavaScript?</li>
+        <li>Make it work</li>
+        <li>Node.js and Karma</li>
+        <li>See it in action</li>
     </ul>
 
-    <aside class="notes">
-        Side notes (hit 's' on your keyboard).
-    </aside>
 </section>
 
 <!-- Example of nested vertical slides -->
@@ -79,7 +97,8 @@
 </section>
 <section>
     <h1>So what are we going to talk about?</h1>
-    <p class="current-visible grow">In server development E2E tests is a nickname for server component tests.</p>
+    <p class="fragment current-visible grow">E2E tests in server development is a colloquial name for server component tests.</p>
+    <p class="fragment current-visible grow">The purpose of these tests is to ensure that that integrated components of an application function as designed.</p>
 </section>
 <section>
     <section>
@@ -88,16 +107,18 @@
     <section>
         <h2>Closer environment</h2>
         <ul>
+            <li>Language is not important, but it brings the eco-system</li>
             <li>E2E should run in as close environment as possible</li>
-            <li>So we have better edge-to-edge converage</li>
             <li>We serve for JavaScript that runs in a browser</li>
-            <li>We find the same DOM implementation</li>
+            <li>So we have better edge-to-edge converage</li>
+            <li>Same DOM implementation</li>
+            <li>Less pollution by classes in the test scope</li>
         </ul>
     </section>
     <section>
         <h2>Why be a type-safe?</h2>
         <ul>
-            <li>It's HTML, JSON, sometimes XML</li>
+            <li>It's <em>HTML</em>, <em>JSON</em>, sometimes <em>XML</em></li>
             <li>No type-safety, no schemas</li>
             <li>Our task is to dispatch a request and assert the response</li>
             <li>It's all about contract</li>
@@ -115,15 +136,19 @@
         <h2>Faster feedback</h2>
         <ul>
             <li>No compilation step is required for a test run</li>
-            <li>Test execution speed plays little part in overall performance</li>
+            <li>It's I/O bound, so test execution speed plays little part</li>
         </ul>
+    </section>
+    <section>
+        <strong>It can work as contract tests for the client</strong>
     </section>
     <section>
         <h2>Technology agnostic</h2>
         <ul>
             <li>The tests become shared with the client end</li>
-            <li>No need to rewrite the tests if move from the current technology</li>
-            <li>You can run the tests from Grunt, Gulp and other tools</li>
+            <li>We can distribute them as an archive of plain files</li>
+            <li>No need to rewrite the tests if moving from the current technology</li>
+            <li>You can run the same tests from <em>Grunt</em>, <em>Gulp</em> and other tools</li>
         </ul>
     </section>
     <section>
@@ -131,10 +156,10 @@
         <pre>
             <code>
     describe("a product service", function() {
-        var client = new HttpClient('http://localhost:9777/');
+        var http = new HttpClient(jsExecConfig.baseUrl);
 
         it("processes the order successfully", () =>
-            whenOrderItemExists({ orderId: 12345 })
+            whenOrderExists({ orderId: 12345 })
                 .then(() => http.post('order/12345/process'))
                 .then(gotResult => expect(gotResult).to.beSuccessful)
         );
@@ -147,23 +172,32 @@
     <h1>Let's work out a solution for that</h1>
 </section>
 <section>
-    <h2>Requirements</h2>
-    <ul>
-        <li>Out-of-the-box for the server developer</li>
-        <li>No dependency to JS build tools</li>
-        <li>At least a minimal IDE support</li>
-        <li>Integrated into the server build</li>
-        <li>CI support</li>
-        <li>HTML scripts must not be executed on load</li>
-        <li>Should support matching both HTML and JSON (duh)</li>
-        <li>It should be possible to add JS dependencies</li>
-    </ul>
+    <section>
+        <h1>Requirements</h1>
+    </section>
+    <section>
+        <h2>Out-of-the-box</h2>
+        <ul>
+            <li>No dependency to JS build tools</li>
+            <li>At least a minimal IDE support</li>
+            <li>Integrated into the server build</li>
+            <li>CI support</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Functional</h2>
+        <ul>
+            <li>Don't evaluate HTML script tags</li>
+            <li>Matching HTML and JSON (duh)</li>
+            <li>3rd party JS dependencies</li>
+        </ul>
+    </section>
 </section>
 
 <section>
     <h2>Things to consider</h2>
     <ul>
-        <li>Two execution contexts: node.js and browser window</li>
+        <li>Two execution contexts: <em>Node.js</em> and <em>window</em></li>
         <li>Imports & dependencies are managed differently</li>
         <li>Tests should be written for either one or another, sharing is not nice</li>
         <li>Promises vs. callbacks</li>
@@ -174,7 +208,7 @@
     <section>
         <h2>How to run it from the Scala/Java project?</h2>
         <ul>
-            <li>We can write a custom test runner (JUnit, sbt test interface etc.)</li>
+            <li>We can write a custom test runner (<em>JUnit</em>, <em>sbt test interface</em> etc.)</li>
             <li>The runner starts the environment</li>
             <li>Which configures the execution environment (dependencies, config files, reporters, test framework)</li>
             <li>Tests are executed while the runner consumes the report output</li>
@@ -199,14 +233,57 @@
 
 <section>
     <section>
-        <h1>What has been dismissed</h1>
+        <h2>JS test frameworks</h2>
         <ul>
-            <li>Bare PhantomJS</li>
-            <li>Nashorn + Avatar.js</li>
+            <li>Jasmine</li>
+            <li>Mocha + Chai</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Short comparison</h2>
+        <ul>
+            <li>Jasmine is more feature rich</li>
+            <li>But Mocha treats the promises well</li>
+       </ul>
+    </section>
+    <section>
+        <h2>Jasmine example</h2>
+        <pre>
+            <code>
+    it("display the greeting to the user", done => {
+        whenOrderExists({ orderId: 12345 })
+            .then(() => http.post('orders/12345/process', {}))
+            .then(gotResult => { expect(gotResult).toBe('OK'); })
+            .catch(err => fail(err))
+            .then(done);
+    });
+            </code>
+        </pre>
+    </section>
+    <section>
+        <h2>Mocha + Chai example</h2>
+        <pre>
+            <code>
+    it("display the greeting to the user", () =>
+        whenOrderExists({ orderId: 12345 })
+            .then(() => http.post('orders/12345/process', {}))
+            .then(gotResult => expect(gotResult).to.be.equal('OK'))
+    );
+            </code>
+        </pre>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h2>What has been dismissed</h2>
+        <ul>
+            <li>PhantomJS</li>
+            <li>Nashorn / Avatar.js</li>
         </ul>
     </section>
 
-    <section>
+    <!-- section>
         <section>
             <h1>PhantomJS</h1>
         </section>
@@ -312,65 +389,49 @@
         <section>
             <h1>Dismissed</h1>
         </section>
-    </section>
+    </section -->
 </section>
 
 <section>
-    <section>
-        <h1>The test frameworks</h1>
-        <ul>
-            <li>Jasmine</li>
-            <li>Mocha + Chai</li>
-        </ul>
-    </section>
-    <section>
-        <ul>
-            <li>Jasmine is more feature rich</li>
-            <li>But Mocha treats the promises well</li>
-            <li>And is easier to run in different environments</li>
-        </ul>
-    </section>
-    <section>
-        <h2>Jasmine example</h2>
-        <pre>
-            <code>
-    it("display the greeting to the user", done => {
-        whenOrderExists({ orderId: 12345 })
-            .then(() => http.post('orders/12345/process', {}))
-            .then(gotResult => { expect(gotResult).toBe('OK'); })
-            .catch(err => fail(err))
-            .then(done);
-    });
-            </code>
-        </pre>
-    </section>
-    <section>
-        <h2>Mocha + Chai example</h2>
-        <pre>
-            <code>
-    it("display the greeting to the user", () =>
-        whenOrderExists({ orderId: 12345 })
-            .then(() => http.post('orders/12345/process', {}))
-            .then(gotResult => expect(gotResult).to.be.equal('OK'))
-    );
-            </code>
-        </pre>
-    </section>
-</section>
-
-<section>
-    <h1>Let's focus on these 2</h1>
-    <ul>
+    <h2>Let's focus on these 2</h2>
+    <ul class="great-bullets">
         <li>Node.js</li>
         <li>Karma</li>
     </ul>
 </section>
 
-
 <section>
     <section>
         <h1>Node.js</h1>
      </section>
+    <section>
+        <h2>How does it work?</h2>
+        <ul>
+            <li>Run <code class="inline-code">npm install package</code> to collect the dependencies</li>
+            <li>Generate a boot script</li>
+            <li>Run: <code class="inline-code">node temp-boot.js</code></li>
+            <li>Collect output</li>
+            <li>Utilize node's <em>HTTP client</em> with <em>jsdom</em></li>
+        </ul>
+    </section>
+    <section>
+        <h3>The boot script</h3>
+        <pre><code>
+var Mocha = require('mocha');
+
+var mocha = new Mocha({
+    reporter: 'mocha-teamcity-reporter'
+});
+
+mocha.addFile('my-test.js');
+
+mocha.run(function(failures) {
+    process.on('exit', function () {
+        process.exit(failures);
+    });
+});
+        </code></pre>
+    </section>
     <section>
         <h2>Pros</h2>
         <ul>
@@ -384,12 +445,24 @@
         <h2>Cons</h2>
         <ul>
             <li>It's not a browser env</li>
-            <li>Harder to inject the configuration</li>
-            <li>jsdom has issues related to contextify lib (fortunately there is a fork jsdom-no-contextify)</li>
+            <li><em>jsdom</em> has issues related to <em>contextify</em> lib (fortunately there is a fork <em>jsdom-no-contextify</em>)</li>
         </ul>
     </section>
     <section>
         <h1>See how it works</h1>
+        <pre>
+            <code class="scala">
+    class HelloNodeSpec extends MochaSpec("specs/hello-mocha.js") with NodeRunner {
+
+        require(
+            "xmlhttprequest",
+            "jsdom-no-contextify",
+            "jquery")
+
+        EmbeddedEnvironment()
+    }
+            </code>
+        </pre>
     </section>
 </section>
 
@@ -399,15 +472,26 @@
     </section>
 
     <section>
+        <h2>How does it work?</h2>
+        <ul>
+            <li>Run <code class="inline-code">npm install package</code> and <code class="inline-code">bower install package</code> to collect the dependencies</li>
+            <li>Generate the karma configuration</li>
+            <li>Run: <code class="inline-code">karma start temp-conf.js --port=9999 --single-run</code></li>
+            <li>Collect output</li>
+            <li>Native <em>XmlHttpRequest</em> and <em>DOMParser</em></li>
+        </ul>
+    </section>
+
+    <section>
         <h3>The configuration</h3>
         <pre>
             <code>
     module.exports = function(config) {
       config.set({
         basePath: '',
-        frameworks: ['jasmine'],
+        frameworks: ['mocha', 'chai'],
         files: [
-          'file1.js', 'file2.js'
+          'dependency-1.js', 'my-test.js'
         ],
         reporters: ['teamcity'],
         colors: false,
@@ -442,11 +526,31 @@
         <h2>Cons</h2>
         <ul>
             <li>Takes a second to start</li>
+            <li>Current <em>PhantomJS</em> utilizes an old <em>WebKit</em> with bugs</li>
+            <li class="fragment">Fortunately there are hacks to overcome it</li>
+            <li class="fragment"><em>PhantomJS v2.1</em> is on it's way</li>
         </ul>
     </section>
 
     <section>
         <h1>See how it works</h1>
+        <pre>
+            <code class="scala">
+    class HelloKarmaSpec extends MochaSpec("specs/hello.js") with KarmaRunner {
+
+        config("baseUrl" ->
+            s"http://localhost:${EmbeddedEnvironment.SERVER_PORT}/")
+
+        bowerInclude(
+            "jquery",
+            "promise-js")
+
+        fileInclude(
+            "src/test/resources/dom-parser-fix.js",
+            "src/test/resources/client.js")
+    }
+            </code>
+        </pre>
     </section>
 </section>
 
@@ -455,9 +559,9 @@
         <h1>To conclude</h1>
     </section>
     <section>
-        <p>Both Node.js and Karma are feasible approaches.</p>
-        <p class="fragment roll-in">Karma is slower to start, but using the actual XHR and DOM implementation</p>
-        <p class="fragment roll-in">Node.js is fast and has great possibilities to host the whole server E2E infrastructure</p>
+        <p>Both <em>Node.js</em> and <em>Karma</em> are feasible approaches.</p>
+        <p class="fragment roll-in"><em>Karma</em> is slower to start, but using the actual <em>XHR</em> and <em>DOM</em> implementation</p>
+        <p class="fragment roll-in"><em>Node.js</em> is fast and has great possibilities to host the whole server E2E infrastructure</p>
         <p class="fragment roll-in">We could actually combine them</p>
     </section>
 </section>
@@ -477,7 +581,7 @@
 <script>
     var revealRoot = "bower_components/reveal-js/";
 
-    var socket = io.connect("http://192.168.0.103:3000");
+    var socket = io.connect("http://present.indrasius.lt");
 
     socket.on("message", function(data){
         console.log(data);
@@ -496,10 +600,10 @@
         center: true,
         transition: 'linear',
         backgroundTransition: 'default',
-        width: 1280,
-        height: 1600,
+        width: 1024,
+        height: 1024,
 
-        theme: 'beige',
+        theme: 'moon',
 
         // Parallax scrolling
         // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',

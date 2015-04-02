@@ -5,7 +5,9 @@ import lt.indrasius.embedded.karma.env.EmbeddedEnvironment
 /**
  * Created by mantas on 15.3.11.
  */
-class HelloNodeSpec extends MochaSpec("specs/hello-mocha.js") with NodeRunner {
+class HelloNodeSpec extends MochaSpec("specs/hello-mocha.js")
+  with NodeRunner {
+
   require(
     "xmlhttprequest",
     "jsdom-no-contextify",
