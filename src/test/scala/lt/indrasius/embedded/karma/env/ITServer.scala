@@ -1,16 +1,22 @@
 package lt.indrasius.embedded.karma.env
 
-import lt.indrasius.rubies.http.picking._
-import lt.indrasius.rubies.http.server.EmbeddedServer
-import spray.http.HttpMethods._
-import spray.http.StatusCodes._
-import spray.http._
+/// code_ref: blaze_server_example
 
-/**
- * Created by mantas on 15.3.7.
- */
-object ITServer extends EmbeddedServer(9777) {
-  val html =
+
+import org.http4s.dsl._
+import org.http4s.headers.`Content-Type`
+import org.http4s.server._
+import org.http4s.server.blaze.BlazeBuilder
+import org.http4s.MediaType._
+import org.http4s.json4s.native.{jsonOf, jsonEncoderOf}
+import org.json4s.{Writer, JValue, Reader}
+
+case class Greeter(name: String)
+case class Greeting(text: String)
+
+object ITServer {
+  val port = 9777
+  val content =
     """
       |<html>
       |  <head>
@@ -22,19 +28,44 @@ object ITServer extends EmbeddedServer(9777) {
       |</html>
     """.stripMargin
 
-  override def receive = {
-    case HttpRequest(POST, uri, _, entity, _) if uri.path.startsWith(Uri.Path("/api/greeting")) =>
-      pick(entity) { greeter: Greeter =>
-        Greeting(s"Hello, ${greeter.name}")
-      }
-    case HttpRequest(GET, uri, _, _, _) if uri.path.startsWith(Uri.Path("/greeting.html")) =>
-      HttpResponse(OK, HttpEntity(ContentType(MediaTypes.`text/html`), html))
+  implicit val greeterDecode = new Reader[Greeter] {
+    import org.json4s._
+
+    def read(value: JValue) = {
+      val JString(name) = value \ "name"
+
+      Greeter(name)
+    }
   }
+
+  implicit val greetingEncoder = new Writer[Greeting] {
+    import org.json4s.JsonDSL._
+
+    def write(obj: Greeting): JValue =
+      ("text" -> obj.text)
+  }
+
+  implicit val foDecoder = jsonOf[Greeter]
+  implicit val greeting = jsonEncoderOf[Greeting]
+
+  val service = HttpService {
+    case GET -> Root / "greeting.html" =>
+      Ok(content).withHeaders(`Content-Type`(`text/html`))
+    case req @ POST -> Root / "api" / "greeting" =>
+      val greeter = req.as[Greeter].run
+
+      Ok().withBody(Greeting(s"Hello, ${greeter.name}")) //.withHeaders(`Content-Type`(`application/json`))
+  }
+
+  val serviceBuilder = BlazeBuilder.bindHttp(port)
+    .mountService(service, "/")
+
+  def start: Unit = serviceBuilder
+    .run
+
+  //sys.addShutdownHook(serviceBuilder)
 }
 
 object Application extends App {
-  ITServer
+  ITServer.start
 }
-
-case class Greeter(name: String)
-case class Greeting(text: String)

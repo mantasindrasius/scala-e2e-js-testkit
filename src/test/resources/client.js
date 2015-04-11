@@ -18,7 +18,6 @@ var HttpClient = function(baseUrl) {
             var url = baseUrl + relative;
 
             xhr.onreadystatechange = function () {
-
                 if (this.readyState == 4) {
                     if (this.status == 200)
                         handleContent(this, fulfill);
@@ -51,6 +50,8 @@ var HttpClient = function(baseUrl) {
             fulfill(document);
         } else if (/^\s*application\/json\s*(?:;|$)/i.test(contentType)) {
             fulfill(JSON.parse(xhr.responseText));
+        } else {
+            fulfill(xhr.responseText);
         }
     }
 };
