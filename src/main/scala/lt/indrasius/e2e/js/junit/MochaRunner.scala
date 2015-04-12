@@ -1,5 +1,6 @@
-package lt.indrasius.e2e.js
+package lt.indrasius.e2e.js.junit
 
+import lt.indrasius.e2e.js._
 import org.junit.runner.notification.{Failure, RunNotifier}
 import org.junit.runner.{Description, Runner}
 

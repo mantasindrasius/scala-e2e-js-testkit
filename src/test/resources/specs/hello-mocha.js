@@ -22,7 +22,7 @@ describe("a greeting service", function() {
             });
     });
 
-    it("handle a 404", function() {
+    xit("handle a 404", function() {
         return client
             .get('xyz.html')
             .catch(function(error) {
@@ -30,15 +30,11 @@ describe("a greeting service", function() {
             });
     });
 
-    it("handle a connection error", function() {
+    xit("handle a connection error", function() {
         return new HttpClient('http://localhost:65535/')
             .get('xyz.html')
             .catch(function(error) {
                 expect(error).to.be.equal('Connection refused');
             });
-    });
-
-    it("be a failed try", function() {
-        expect(true).to.be.false;
     });
 });

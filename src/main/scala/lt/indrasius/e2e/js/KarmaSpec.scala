@@ -1,5 +1,6 @@
 package lt.indrasius.e2e.js
 
+import lt.indrasius.e2e.js.junit.KarmaJasmineRunner
 import org.junit.runner.RunWith
 
 /**
