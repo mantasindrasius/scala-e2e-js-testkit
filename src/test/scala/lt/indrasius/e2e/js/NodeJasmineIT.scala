@@ -1,6 +1,6 @@
-package lt.indrasius.embedded.karma
+package lt.indrasius.e2e.js
 
-import lt.indrasius.embedded.karma.env.EmbeddedEnvironment
+import lt.indrasius.e2e.js.env.EmbeddedEnvironment
 import org.specs2.matcher.MustMatchers
 import org.specs2.mutable.SpecificationWithJUnit
 

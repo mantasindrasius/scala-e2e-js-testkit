@@ -1,4 +1,4 @@
-package lt.indrasius.embedded.karma.env
+package lt.indrasius.e2e.js.env
 
 /// code_ref: blaze_server_example
 

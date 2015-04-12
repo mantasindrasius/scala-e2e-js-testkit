@@ -1,4 +1,4 @@
-package lt.indrasius.embedded.karma
+package lt.indrasius.e2e.js
 
 import org.junit.runner.RunWith
 

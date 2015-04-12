@@ -1,6 +1,6 @@
-package lt.indrasius.embedded.karma
+package lt.indrasius.e2e.js
 
-import org.specs2.matcher.{MustMatchers, Matchers, Matcher}
+import org.specs2.matcher.{Matcher, Matchers, MustMatchers}
 
 /**
  * Created by mantas on 15.3.10.

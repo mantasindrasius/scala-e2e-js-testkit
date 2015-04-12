@@ -1,11 +1,11 @@
-package lt.indrasius.embedded.karma
+package lt.indrasius.e2e.js
 
 import java.io.File
 import java.nio.file.Files
 
-import com.twitter.io.{TempDirectory, TempFile}
+import com.twitter.io.TempDirectory
 
-import scala.sys.process.{ProcessLogger, Process}
+import scala.sys.process.{Process, ProcessLogger}
 import scala.util.{Success, Try}
 
 /**

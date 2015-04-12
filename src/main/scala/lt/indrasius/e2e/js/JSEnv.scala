@@ -1,7 +1,8 @@
-package lt.indrasius.embedded.karma
+package lt.indrasius.e2e.js
 
 import java.io.File
 import java.nio.file.{Files, Paths}
+
 import org.json4s._
 import org.json4s.native.JsonMethods._
 

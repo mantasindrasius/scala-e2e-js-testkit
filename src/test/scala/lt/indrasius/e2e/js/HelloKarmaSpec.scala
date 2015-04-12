@@ -1,6 +1,6 @@
-package lt.indrasius.embedded.karma
+package lt.indrasius.e2e.js
 
-import lt.indrasius.embedded.karma.env.EmbeddedEnvironment
+import lt.indrasius.e2e.js.env.EmbeddedEnvironment
 
 /**
  * Created by mantas on 15.3.5.

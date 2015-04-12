@@ -1,4 +1,4 @@
-package lt.indrasius.embedded.karma
+package lt.indrasius.e2e.js
 
 import com.sun.media.sound.InvalidFormatException
 import org.specs2.matcher.Matcher

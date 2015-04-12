@@ -1,7 +1,7 @@
-package lt.indrasius.embedded.karma
+package lt.indrasius.e2e.js
 
 import java.io.File
-import java.nio.file.{Paths, Files}
+import java.nio.file.{Files, Paths}
 
 /**
  * Created by mantas on 15.3.24.

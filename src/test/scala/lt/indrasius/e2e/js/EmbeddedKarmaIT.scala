@@ -1,7 +1,7 @@
-package lt.indrasius.embedded.karma
+package lt.indrasius.e2e.js
 
 import java.nio.file.Paths
-import lt.indrasius.embedded.karma.env.EmbeddedEnvironment
+
 import org.specs2.matcher.MustMatchers
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope

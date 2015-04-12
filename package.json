@@ -1,5 +1,5 @@
 {
-  "name": "embedded-karma",
+  "name": "js-e2e-testkit",
   "version": "1.0.0",
   "devDependencies": {
     "karma": "*",

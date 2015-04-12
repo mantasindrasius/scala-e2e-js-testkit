@@ -1,7 +1,7 @@
-package lt.indrasius.embedded.karma
+package lt.indrasius.e2e.js
 
-import org.junit.runner.{Result, Description, Runner}
 import org.junit.runner.notification.{Failure, RunNotifier}
+import org.junit.runner.{Description, Runner}
 
 /**
  * Created by mantas on 15.3.5.
