@@ -102,6 +102,12 @@ class TeamCityRecordParserTest extends SpecificationWithJUnit {
       }
     }
 
+    "parse testIgnored" in {
+      parser.parse("##teamcity[testIgnored name='be ignored']") must beSuccessfulTry {
+        TestIgnoredEvent("be ignored")
+      }
+    }
+
     "parse blockClosed" in {
       parser.parse("##teamcity[blockClosed name='DEF']") must beSuccessfulTry {
         BlockClosedEvent("DEF")

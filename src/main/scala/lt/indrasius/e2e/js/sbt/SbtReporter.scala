@@ -16,7 +16,7 @@ class SbtReporter(taskDef: TaskDef, eventHandler: EventHandler, loggers: Array[L
         eventHandler.handle(SbtPendingEvent(desc, selector, fingerprint))
       case TestSuiteFinishedEvent(desc) =>
         eventHandler.handle(SbtSuccessEvent(desc, 0, selector, fingerprint))
-      case TestStartedEvent(desc) =>
+      case TestIgnoredEvent(desc) =>
         eventHandler.handle(SbtPendingEvent(desc, selector, fingerprint))
       case TestFinishedEvent(desc, duration) =>
         eventHandler.handle(SbtSuccessEvent(desc, duration.getOrElse(0).toLong, selector,

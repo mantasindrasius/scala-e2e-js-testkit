@@ -105,5 +105,6 @@ case class TestStartedEvent(description: String) extends LogEvent
 case class TestFinishedEvent(description: String, duration: Option[Int] = None) extends LogEvent
 case class TestSuiteFinishedEvent(description: String) extends LogEvent
 case class TestFailedEvent(description: String, message: String, details: String) extends LogEvent
+case class TestIgnoredEvent(description: String) extends LogEvent
 case class BlockClosedEvent(description: String) extends LogEvent
 case class TestRunnerDisconnectedEvent(description: String) extends LogEvent

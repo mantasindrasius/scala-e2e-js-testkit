@@ -61,10 +61,10 @@ class SbtReporterSpec extends Specification with Mockito {
       }
     }
 
-    "report test started event" in new Context(testSelector("test 1")) {
+    "report test ignored event" in new Context(testSelector("test 1")) {
       val test = "test 1"
 
-      reporter.report(TestStartedEvent(test))
+      reporter.report(TestIgnoredEvent(test))
 
       got {
         one(eventHandler).handle(aTestEventWith(test, Status.Pending))

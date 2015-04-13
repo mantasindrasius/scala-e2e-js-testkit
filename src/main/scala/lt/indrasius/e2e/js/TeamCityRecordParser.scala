@@ -29,6 +29,7 @@ class TeamCityRecordParser {
       case TeamCityRecord("blockOpened", params) => BlockOpenedEvent(params.getOrElse("name", ""))
       case TeamCityRecord("testSuiteStarted", params) => TestSuiteStartedEvent(params.getOrElse("name", ""))
       case TeamCityRecord("testStarted", params) => TestStartedEvent(params.getOrElse("name", ""))
+      case TeamCityRecord("testIgnored", params) => TestIgnoredEvent(params.getOrElse("name", ""))
       case TeamCityRecord("testFinished", params) =>
         TestFinishedEvent(
           description = params.getOrElse("name", ""),

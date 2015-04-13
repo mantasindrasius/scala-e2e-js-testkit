@@ -15,6 +15,10 @@ describe("a greeting service", function() {
         expect(true).to.be.false;
     });
 
+    xit("be ignored", function() {
+        expect(true).to.be.false;
+    });
+
     it("be a successful try with deferred done", function(done) {
         setTimeout(function() {
             expect(true).to.be.true;
