@@ -1,8 +1,5 @@
 package lt.indrasius.e2e.js.env
 
-/// code_ref: blaze_server_example
-
-
 import org.http4s.dsl._
 import org.http4s.headers.`Content-Type`
 import org.http4s.server._

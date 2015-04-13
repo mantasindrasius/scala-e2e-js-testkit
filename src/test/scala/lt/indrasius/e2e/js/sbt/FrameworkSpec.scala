@@ -1,7 +1,7 @@
 package lt.indrasius.e2e.js.sbt
 
 import lt.indrasius.e2e.js.sbt.FrameworkSpec.TestTest
-import lt.indrasius.e2e.js.{NodeRunner, MochaSpec, JSSpec}
+import lt.indrasius.e2e.js.{KarmaRunner, NodeRunner, MochaSpec, JSSpec}
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -72,6 +72,6 @@ class FrameworkSpec extends Specification {
 
 object FrameworkSpec {
 
-  class TestTest extends MochaSpec("sbt/test.js") with NodeRunner
+  class TestTest extends MochaSpec("sbt/test.js") with KarmaRunner
 
 }

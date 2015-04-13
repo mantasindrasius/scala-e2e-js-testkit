@@ -12,9 +12,13 @@ import scala.sys.process.Process
  * Created by mantas on 15.3.23.
  */
 object JSEnv {
-  private val globalDirFile = new File(".").getAbsoluteFile
+  private val userHome = sys.props.get("user.home").getOrElse(".")
+  private val userHomeFile = new File(userHome)
+  private val globalDirFile = new File(userHomeFile, ".js-e2e").getAbsoluteFile
   private val nodeModulesDirFile = new File(globalDirFile, "node_modules")
   private val bowerComponentsDir = new File(globalDirFile, "bower_components")
+  private val npmLock = new AnyRef
+  private val bowerLock = new AnyRef
 
   globalDirFile.mkdirs()
 
@@ -22,20 +26,30 @@ object JSEnv {
 
   def installNodePackageIfNeeded(name: String) = {
     if (!nodePackageExists(name)) {
-      sys.process.Process(Seq("npm", "install", name), globalDirFile).!!
+      npmLock.synchronized {
+        //sys.process.Process(Seq("npm", "install", name), globalDirFile).lineStream.toIndexedSeq
+        val pb = Process(s"npm install $name", globalDirFile)
+
+        pb.run().exitValue()
+      }
     }
   }
 
   def installBowerPackageIfNeeded(name: String) = {
     if (!bowerPackageExists(name)) {
-      val pb = Process(s"bower install $name", globalDirFile)
+      bowerLock.synchronized {
+        val pb = Process(s"bower install $name", globalDirFile)
 
-      pb.run().exitValue()
+        pb.run().exitValue()
+      }
     }
   }
 
+  def getNodePackageDir(name: String): String =
+    new File(nodeModulesDirFile, name).getAbsolutePath
+
   def nodePackageExists(name: String): Boolean =
-    new File(nodeModulesDirFile, name).exists()
+    new File(getNodePackageDir(name)).exists()
 
   def bowerPackageExists(name: String): Boolean =
     new File(bowerComponentsDir, name).exists()

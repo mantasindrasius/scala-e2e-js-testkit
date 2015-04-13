@@ -12,7 +12,7 @@ import scala.util.Success
 class NodeMocha {
   val recordParser = new TeamCityRecordParser
 
-  def makeRunnerScript(testFile:String) =
+  def makeRunnerScript(testFile: String) =
     s"""
       |var Mocha = require('mocha'),
       |    fs = require('fs'),
@@ -35,34 +35,15 @@ class NodeMocha {
       |});
     """.stripMargin
 
-  def makePackageJson =
-    """
-      |{
-      |    "name": "mocha-test",
-      |    "version": "1.0.0",
-      |    "devDependencies": {
-      |        "mocha": "*",
-      |        "xmlhttprequest": "*",
-      |        "jsdom": "*",
-      |        "contextify": "*",
-      |        "mocha-teamcity-reporter": "*"
-      |    },
-      |    "engines": {
-      |        "node": ">=0.8.0"
-      |    }
-      |}
-      |
-    """.stripMargin
-
   def run(filePath: String): Stream[LogEvent] = {
-    val tempDir = new File(".")
-    val tempPath = tempDir.toPath
+    val globalDirFile = new File(JSEnv.globalDir)
 
-    val runnerFile = tempPath.resolve("run.js")
+    val runnerFile = File.createTempFile("run", ".js", globalDirFile).toPath
+    val runScript = makeRunnerScript(filePath)
 
-    Files.write(runnerFile, makeRunnerScript(filePath).getBytes)
+    Files.write(runnerFile, runScript.getBytes)
 
-    val process = Process(s"node $runnerFile")
+    val process = Process(s"node $runnerFile", globalDirFile)
 
     val logger = ProcessLogger(s => (), err => ())
     val lines = process.lines_!
