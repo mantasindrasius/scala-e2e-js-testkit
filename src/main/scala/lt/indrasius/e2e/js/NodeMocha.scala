@@ -3,13 +3,15 @@ package lt.indrasius.e2e.js
 import java.io.File
 import java.nio.file.Files
 
+import lt.indrasius.e2e.js.common.TeamCityRecordParser
+
 import scala.sys.process.{Process, ProcessLogger}
 import scala.util.Success
 
 /**
  * Created by mantas on 15.3.10.
  */
-class NodeMocha {
+object NodeMocha {
   val recordParser = new TeamCityRecordParser
 
   def makeRunnerScript(testFile: String) =
@@ -36,10 +38,11 @@ class NodeMocha {
     """.stripMargin
 
   def run(filePath: String): Stream[LogEvent] = {
+    val specFile = getClass.getClassLoader.getResource(filePath).getFile
     val globalDirFile = new File(JSEnv.globalDir)
 
     val runnerFile = File.createTempFile("run", ".js", globalDirFile)
-    val runScript = makeRunnerScript(filePath)
+    val runScript = makeRunnerScript(specFile)
 
     runnerFile.deleteOnExit()
 

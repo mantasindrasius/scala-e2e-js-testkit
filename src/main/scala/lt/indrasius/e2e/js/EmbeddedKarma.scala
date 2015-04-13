@@ -4,6 +4,7 @@ import java.io.File
 import java.nio.file.Files
 
 import com.twitter.io.TempDirectory
+import lt.indrasius.e2e.js.common.TeamCityRecordParser
 
 import scala.sys.process.{Process, ProcessLogger}
 import scala.util.{Success, Try}

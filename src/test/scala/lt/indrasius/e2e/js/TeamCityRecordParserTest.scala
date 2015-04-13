@@ -1,6 +1,7 @@
 package lt.indrasius.e2e.js
 
 import com.sun.media.sound.InvalidFormatException
+import lt.indrasius.e2e.js.common.{TeamCityRecord, TeamCityRecordParser}
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.SpecificationWithJUnit
 

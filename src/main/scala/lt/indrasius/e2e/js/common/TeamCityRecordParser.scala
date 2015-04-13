@@ -1,6 +1,7 @@
-package lt.indrasius.e2e.js
+package lt.indrasius.e2e.js.common
 
 import com.sun.media.sound.InvalidFormatException
+import lt.indrasius.e2e.js._
 
 import scala.util.{Failure, Success, Try}
 

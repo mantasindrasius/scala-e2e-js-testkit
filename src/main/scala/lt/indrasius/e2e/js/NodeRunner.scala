@@ -8,8 +8,16 @@ trait NodeRunner extends JSSpecEnvironmentRunner {
     names foreach { JSEnv.installNodePackageIfNeeded(_) }
 
   def runSpec(file: String): Stream[LogEvent] = {
-    val nj = new NodeMocha
-
-    nj.run(getClass.getClassLoader.getResource(file).getFile)
+    NodeMocha.run(file)
   }
 }
+
+/*class HelloNodeSpec extends MochaSpec("specs/hello-mocha.js") with NodeRunner {
+  require(
+    "xmlhttprequest",
+    "jsdom-no-contextify",
+    "jquery",
+    "promise")
+
+  EmbeddedEnvironment()
+}*/

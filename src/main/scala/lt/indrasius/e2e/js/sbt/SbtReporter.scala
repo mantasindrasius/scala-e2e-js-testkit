@@ -29,19 +29,20 @@ class SbtReporter(taskDef: TaskDef, eventHandler: EventHandler, loggers: Array[L
         eventHandler.handle(SbtFailureEvent(desc, 0, selector,
           fingerprint, new OptionalThrowable(new AssertionError(errorMessage))))
       case InfoEvent(message) =>
-        log(message)
+        info(message)
       case ev =>
-        log(s"Ignored: $ev")
+        info(s"Ignored: $ev")
     }
   }
 
-  def log(msg: String) =
-    loggers foreach { logger =>
-      logger.info(msg)
-    }
+  def info(msg: String) =
+    logTo { _.info(msg) }
 
   def error(msg: String) =
+    logTo { _.error(msg) }
+
+  def logTo(f: Logger => Unit) =
     loggers foreach { logger =>
-      logger.error(msg)
+      f(logger)
     }
 }

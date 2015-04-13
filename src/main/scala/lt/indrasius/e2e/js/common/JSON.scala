@@ -1,4 +1,4 @@
-package lt.indrasius.e2e.js
+package lt.indrasius.e2e.js.common
 
 /**
  * Created by mantas on 15.3.24.

@@ -3,6 +3,8 @@ package lt.indrasius.e2e.js
 import java.io.File
 import java.nio.file.{Files, Paths}
 
+import lt.indrasius.e2e.js.common.JSON
+
 /**
  * Created by mantas on 15.3.24.
  */
