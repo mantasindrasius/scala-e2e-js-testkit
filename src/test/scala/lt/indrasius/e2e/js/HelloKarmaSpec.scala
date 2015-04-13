@@ -14,7 +14,7 @@ class HelloKarmaSpec extends MochaSpec("specs/hello.js") with KarmaRunner {
     "jquery",
     "promise-js")
 
-  fileInclude(
-    "src/test/resources/dom-parser-fix.js",
-    "src/test/resources/client.js")
+  classPathInclude(
+    "js-e2e/dom-parser-fix.js",
+    "client.js")
 }
