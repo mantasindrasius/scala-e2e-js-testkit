@@ -1,12 +1,13 @@
-package lt.indrasius.e2e.js
+package lt.indrasius.e2e.js.it
 
+import lt.indrasius.e2e.js.EmbeddedPhantom
 import lt.indrasius.e2e.js.env.EmbeddedEnvironment
 import org.specs2.mutable.SpecificationWithJUnit
 
 /**
  * Created by mantas on 15.3.7.
  */
-class EmbeddedPhantomIT extends SpecificationWithJUnit {
+class EmbeddedPhantomSpec extends SpecificationWithJUnit {
   val port = EmbeddedEnvironment.SERVER_PORT
 
   "EmbeddedPhantom" should {

@@ -1,5 +1,6 @@
-package lt.indrasius.e2e.js
+package lt.indrasius.e2e.js.support
 
+import lt.indrasius.e2e.js._
 import org.specs2.matcher.{Matcher, Matchers, MustMatchers}
 
 /**

@@ -1,13 +1,14 @@
-package lt.indrasius.e2e.js
+package lt.indrasius.e2e.js.it
 
 import java.nio.file.Paths
 
+import lt.indrasius.e2e.js.JSEnv
 import org.specs2.mutable.SpecificationWithJUnit
 
 /**
  * Created by mantas on 15.3.24.
  */
-class JSEnvIT extends SpecificationWithJUnit {
+class JSEnvSpec extends SpecificationWithJUnit {
   skipAll
 
   "JSEnv" should {

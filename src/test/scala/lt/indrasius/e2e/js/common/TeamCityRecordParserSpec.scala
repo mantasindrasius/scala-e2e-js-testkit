@@ -1,14 +1,14 @@
-package lt.indrasius.e2e.js
+package lt.indrasius.e2e.js.common
 
 import com.sun.media.sound.InvalidFormatException
-import lt.indrasius.e2e.js.common.{TeamCityRecord, TeamCityRecordParser}
+import lt.indrasius.e2e.js._
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.SpecificationWithJUnit
 
 /**
  * Created by mantas on 15.3.9.
  */
-class TeamCityRecordParserTest extends SpecificationWithJUnit {
+class TeamCityRecordParserSpec extends SpecificationWithJUnit {
   val parser = new TeamCityRecordParser
 
   def beTeamCityRecord(withName: String, withParamsThatAre: Matcher[Map[String, String]]): Matcher[TeamCityRecord] =

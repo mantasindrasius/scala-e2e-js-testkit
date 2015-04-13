@@ -1,7 +1,9 @@
-package lt.indrasius.e2e.js
+package lt.indrasius.e2e.js.it
 
 import java.nio.file.Paths
 
+import lt.indrasius.e2e.js.EmbeddedKarma
+import lt.indrasius.e2e.js.support.LogEventsMatchers
 import org.specs2.matcher.MustMatchers
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
@@ -9,7 +11,7 @@ import org.specs2.specification.Scope
 /**
  * Created by mantas on 15.3.4.
  */
-class EmbeddedKarmaIT extends Specification with MustMatchers with LogEventsMatchers {
+class EmbeddedKarmaSpec extends Specification with MustMatchers with LogEventsMatchers {
   sequential
 
   class Context extends Scope {
