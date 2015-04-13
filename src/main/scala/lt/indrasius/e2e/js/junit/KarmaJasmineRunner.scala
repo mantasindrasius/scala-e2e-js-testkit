@@ -12,7 +12,7 @@ class KarmaJasmineRunner(testClass: Class[_]) extends Runner {
     Description.createSuiteDescription(testClass)
 
   override def run(notifier: RunNotifier): Unit = {
-    val karma = new EmbeddedKarma(9898,
+    val karma = new EmbeddedKarma(
       Seq("bower_components/jquery/dist/jquery.js",
         "bower_components/promise-js/promise.js",
         "src/test/resources/dom-parser-fix.js",

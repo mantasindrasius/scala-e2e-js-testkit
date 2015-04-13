@@ -39,7 +39,7 @@ trait KarmaRunner extends JSSpecEnvironmentRunner {
       println("Including " + f)
     }
 
-    val karma = new EmbeddedKarma(9898, inclFiles)
+    val karma = new EmbeddedKarma(inclFiles)
 
     karma.startSingle(file)
   }

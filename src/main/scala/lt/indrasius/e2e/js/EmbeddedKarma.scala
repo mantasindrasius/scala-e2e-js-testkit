@@ -11,7 +11,7 @@ import scala.util.{Success, Try}
 /**
  * Created by mantas on 15.3.4.
  */
-class EmbeddedKarma(port: Int, dependencies: Seq[String] = Nil) {
+class EmbeddedKarma(dependencies: Seq[String] = Nil) {
   val tempDir = TempDirectory.create(true)
   val karmaConfig = "karma.conf.js"
   val karmaConfPath = tempDir.toPath.resolve(karmaConfig)
@@ -75,7 +75,7 @@ class EmbeddedKarma(port: Int, dependencies: Seq[String] = Nil) {
     mkKarmaConfig(dependencies :+ specPath)
 
     val logger = ProcessLogger(s => (), err => System.err.println(err))
-    val process = Process(s"karma start $karmaConfPath --port=$port --single-run", new File(JSEnv.globalDir))
+    val process = Process(s"karma start $karmaConfPath --single-run", new File(JSEnv.globalDir))
     val lines = process.lines_!
 
     process.run(logger)

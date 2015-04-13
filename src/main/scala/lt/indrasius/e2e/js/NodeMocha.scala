@@ -38,10 +38,12 @@ class NodeMocha {
   def run(filePath: String): Stream[LogEvent] = {
     val globalDirFile = new File(JSEnv.globalDir)
 
-    val runnerFile = File.createTempFile("run", ".js", globalDirFile).toPath
+    val runnerFile = File.createTempFile("run", ".js", globalDirFile)
     val runScript = makeRunnerScript(filePath)
 
-    Files.write(runnerFile, runScript.getBytes)
+    runnerFile.deleteOnExit()
+
+    Files.write(runnerFile.toPath, runScript.getBytes)
 
     val process = Process(s"node $runnerFile", globalDirFile)
 

@@ -24,7 +24,7 @@ class EmbeddedKarmaIT extends Specification with MustMatchers with LogEventsMatc
 
   "EmbeddedKarma" should {
     "run karma test" in new Context {
-      val karma = new EmbeddedKarma(9898, deps)
+      val karma = new EmbeddedKarma(deps)
 
       val result = karma.startSingle("specs/hello-karma.js")
       val lines = result.toIndexedSeq
@@ -35,7 +35,7 @@ class EmbeddedKarmaIT extends Specification with MustMatchers with LogEventsMatc
     }
 
     "get a karma disconnect message" in new Context {
-      val karma = new EmbeddedKarma(9899, deps)
+      val karma = new EmbeddedKarma(deps)
 
       val result = karma.startSingle("specs/hello-disconnect.js")
       val lines = result.toIndexedSeq
